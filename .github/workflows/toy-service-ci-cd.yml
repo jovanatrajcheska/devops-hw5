@@ -1,0 +1,25 @@
+name: CI for Toy-Service
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    # Build backend
+    - name: Build Backend Docker Image
+      run: |
+        docker build -t toy-backend:${{ github.ref_name }} ./backend
+
+    # Build frontend
+    - name: Build Frontend Docker Image
+      run: |
+        docker build -t toy-frontend:${{ github.ref_name }} ./frontend

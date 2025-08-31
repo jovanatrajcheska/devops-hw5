@@ -33,6 +33,7 @@ jobs:
 
     - name: Configure Kubernetes
       run: |
+        mkdir -p $HOME/.kube
         echo "${{ secrets.KUBECONFIG_CONTENT }}" > $HOME/.kube/config
         kubectl config use-context minikube
 
