@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: toy-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: toy-backend:dev
+        ports:
+        - containerPort: 4000
+        env:
+        - name: MONGO_URI
+          value: "mongodb://mongo:27017/toydb"
