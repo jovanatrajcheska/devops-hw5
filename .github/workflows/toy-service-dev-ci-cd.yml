@@ -18,7 +18,7 @@ jobs:
 
       - name: Configure Docker to use Minikube
         shell: powershell
-        run: & minikube -p minikube docker-env --shell powershell | Invoke-Expression
+        run: minikube -p minikube docker-env --shell powershell | Invoke-Expression
 
       - name: Build Backend Docker Image
         run: docker build -t toy-backend:dev ./backend
