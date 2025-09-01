@@ -8,6 +8,10 @@ on:
     branches:
       - dev
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build-and-deploy:
     runs-on: self-hosted
@@ -16,29 +20,30 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Configure Docker to use Minikube
         shell: powershell
         run: minikube -p minikube docker-env --shell powershell | Invoke-Expression
 
       - name: Build Backend Docker Image
-        shell: powershell
         run: docker build -t toy-backend:dev ./backend
 
-      - name: Push Backend Docker Image to GHCR
-        shell: powershell
-        run: |
-          docker tag toy-backend:dev ghcr.io/jovanatrajcheska/toy-backend:dev
-          docker push ghcr.io/jovanatrajcheska/toy-backend:dev
+      - name: Tag and Push Backend
+        run: docker tag toy-backend:dev ghcr.io/jovanatrajcheska/toy-backend:dev
+      - run: docker push ghcr.io/jovanatrajcheska/toy-backend:dev
 
       - name: Build Frontend Docker Image
-        shell: powershell
         run: docker build -t toy-frontend:dev ./frontend
 
-      - name: Push Frontend Docker Image to GHCR
-        shell: powershell
-        run: |
-          docker tag toy-frontend:dev ghcr.io/jovanatrajcheska/toy-frontend:dev
-          docker push ghcr.io/jovanatrajcheska/toy-frontend:dev
+      - name: Tag and Push Frontend
+        run: docker tag toy-frontend:dev ghcr.io/jovanatrajcheska/toy-frontend:dev
+      - run: docker push ghcr.io/jovanatrajcheska/toy-frontend:dev
 
       - name: Configure Kubernetes
         shell: powershell
@@ -49,25 +54,21 @@ jobs:
           kubectl get nodes
 
       - name: Deploy MongoDB
-        shell: powershell
         run: |
           kubectl apply -f k8s/mongo-deployment.yaml
           kubectl apply -f k8s/mongo-service.yaml
 
       - name: Deploy Backend
-        shell: powershell
         run: |
           kubectl apply -f k8s/backend-deployment.yaml
           kubectl apply -f k8s/backend-service.yaml
 
       - name: Deploy Frontend
-        shell: powershell
         run: |
           kubectl apply -f k8s/frontend-deployment.yaml
           kubectl apply -f k8s/frontend-service.yaml
 
       - name: Verify Deployment
-        shell: powershell
         run: |
           kubectl get pods
           kubectl get svc
