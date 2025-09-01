@@ -10,16 +10,15 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted 
+    runs-on: self-hosted
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Configure Docker to use Minikube
-        run: |
-          echo "Setting Docker environment to Minikube"
-          eval $(minikube docker-env)
+        shell: powershell
+        run: & minikube -p minikube docker-env --shell powershell | Invoke-Expression
 
       - name: Build Backend Docker Image
         run: docker build -t toy-backend:dev ./backend
@@ -28,9 +27,10 @@ jobs:
         run: docker build -t toy-frontend:dev ./frontend
 
       - name: Configure Kubernetes
+        shell: powershell
         run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBECONFIG_CONTENT }}" > $HOME/.kube/config
+          New-Item -ItemType Directory -Force -Path $HOME\.kube
+          Set-Content -Path $HOME\.kube\config -Value "${{ secrets.KUBECONFIG_CONTENT }}"
           kubectl config use-context minikube
           kubectl get nodes
 
@@ -51,8 +51,5 @@ jobs:
 
       - name: Verify Deployment
         run: |
-          echo "Pods:"
           kubectl get pods
-          echo "Services:"
           kubectl get svc
-
