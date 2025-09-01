@@ -39,9 +39,10 @@ jobs:
 
     - name: Deploy to Dev Namespace
       run: |
-        kubectl apply -f k8s/mongo-deployment.yaml -n toy-app
-        kubectl apply -f k8s/mongo-service.yaml -n toy-app
-        kubectl apply -f k8s/backend-deployment.yaml -n toy-app
-        kubectl apply -f k8s/backend-service.yaml -n toy-app
-        kubectl apply -f k8s/frontend-deployment.yaml -n toy-app
-        kubectl apply -f k8s/frontend-service.yaml -n toy-app
+        # kubectl apply -f k8s/mongo-deployment.yaml -n toy-app
+        # kubectl apply -f k8s/mongo-service.yaml -n toy-app
+        # kubectl apply -f k8s/backend-deployment.yaml -n toy-app
+        # kubectl apply -f k8s/backend-service.yaml -n toy-app
+        # kubectl apply -f k8s/frontend-deployment.yaml -n toy-app
+        # kubectl apply -f k8s/frontend-service.yaml -n toy-app
+        kubectl apply -f k8s/
