@@ -8,8 +8,12 @@ on:
     branches:
       - dev
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
-  build-and-deploy:
+  build-deploy:
     runs-on: self-hosted
 
     steps:
@@ -25,6 +29,19 @@ jobs:
 
       - name: Build Frontend Docker Image
         run: docker build -t toy-frontend:dev ./frontend
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Push Backend to GHCR
+        run: docker tag toy-backend:dev ghcr.io/jovanatrajcheska/toy-backend:dev && docker push ghcr.io/jovanatrajcheska/toy-backend:dev
+
+      - name: Push Frontend to GHCR
+        run: docker tag toy-frontend:dev ghcr.io/jovanatrajcheska/toy-frontend:dev && docker push ghcr.io/jovanatrajcheska/toy-frontend:dev
 
       - name: Configure Kubernetes
         shell: powershell
@@ -48,6 +65,11 @@ jobs:
         run: |
           kubectl apply -f k8s/frontend-deployment.yaml
           kubectl apply -f k8s/frontend-service.yaml
+
+      - name: Refresh Deployments
+        run: |
+          kubectl rollout restart deployment backend
+          kubectl rollout restart deployment frontend
 
       - name: Verify Deployment
         run: |
