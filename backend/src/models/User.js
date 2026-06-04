@@ -5,4 +5,5 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
 }, { timestamps: true });
 // test change in user.js
+// change after updating secret variables
 export default mongoose.model('User', userSchema);
