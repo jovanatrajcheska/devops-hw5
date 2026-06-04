@@ -8,5 +8,5 @@ const swapSchema = new mongoose.Schema({
   message: String,
   status: { type: String, enum: ['pending', 'accepted', 'declined', 'picked_up'], default: 'pending' }
 }, { timestamps: true });
-
+// change something
 export default mongoose.model('Swap', swapSchema);
